@@ -1,274 +1,3 @@
-//深度优先
-#include<stdio.h>
-#define DM 15
-#define PATH 20
-#define CLOSE 100000
-typedef int BOOL;
-#define TRUE  1
-#define FALSE 0
-int a[3][3];
-int b[CLOSE][3][3]; 
-int c[PATH][3][3]; 
-int i0,j0;
-void DFS(int i0,int j0);
-void exchange(int *a,int *b)
-{
-  int temp;
-  temp=*a;
-  *a=*b;
-  *b=temp;
-}
-int blank_left(int i0,int j0)
-{ 
-	exchange(&a[i0][j0-1],&a[i0][j0]);
-} 
-int blank_right(int i0,int j0)
-{ 
-	exchange(&a[i0][j0+1],&a[i0][j0]);
-}
-int blank_up(int i0,int j0)
-{ 
-	exchange(&a[i0-1][j0],&a[i0][j0]);
-}
-int blank_down(int i0,int j0)
-{
-	exchange(&a[i0+1][j0],&a[i0][j0]);
-}
-void show_matrix(int a[3][3])
-{ 
-	int i,j;
-	for(i=0;i<3;i++)
-	{
-		for(j=0;j<3;j++)
-		{
-			printf("%d ",a[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-}
-void save_matrix(int b[3][3],int a[3][3])
-{
-	int i,j;
-	for(i=0;i<3;i++)
-	{
-		for(j=0;j<3;j++)
-		{
-			b[i][j]=a[i][j];
-		}
-	}
-}
-BOOL ComparePath(int num)
-{ 
-	if(a[0][0]==c[num][0][0]&&
-	a[0][1]==c[num][0][1]&&
-	a[0][2]==c[num][0][2]&&
-	a[1][0]==c[num][1][0]&&
-	a[1][1]==c[num][1][1]&&
-	a[1][2]==c[num][1][2]&&
-	a[2][0]==c[num][2][0]&&
-	a[2][1]==c[num][2][1]&&
-	a[2][2]==c[num][2][2])
-		return TRUE;
-	else
-		return FALSE;
-}
-BOOL CompareClose(int num)
-{ 
-	if(a[0][0]==b[num][0][0]&&
-	a[0][1]==b[num][0][1]&&
-	a[0][2]==b[num][0][2]&&
-	a[1][0]==b[num][1][0]&&
-	a[1][1]==b[num][1][1]&&
-	a[1][2]==b[num][1][2]&&
-	a[2][0]==b[num][2][0]&&
-	a[2][1]==b[num][2][1]&&
-	a[2][2]==b[num][2][2])
-		return TRUE;
-	else
-		return FALSE;
-}
-BOOL CompareAll(int close,int path)
-{
-	int i;
-	for(i=0;i<path;i++)
-	{
-		if(ComparePath(i)==TRUE)//在表Path中 
-			return TRUE;
-	}
-	for(i=0;i<close;i++)//在表close中 
-	{
-		if(CompareClose(i)==TRUE)
-			return TRUE;
-	}
-	return FALSE;
-} 
-BOOL IsTravel(int f,int close,int path,int i0,int j0)
-{
-	BOOL flag=FALSE;
-	if(f==0)
-	{
-		blank_left(i0,j0);
-		if(CompareAll(close,path)==TRUE)
-			flag=TRUE;
-		blank_right(i0,j0-1);
-	}
-	else if(f==1)
-	{
-		blank_up(i0,j0);
-		if(CompareAll(close,path)==TRUE)
-			flag=TRUE;
-		blank_down(i0-1,j0);
-	}
-	else if(f==2)
-	{
-		blank_right(i0,j0);
-		if(CompareAll(close,path)==TRUE)
-			flag=TRUE;
-		blank_left(i0,j0+1);
-	}
-	else if(f==3)
-	{
-		blank_down(i0,j0);
-		if(CompareAll(close,path)==TRUE)
-			flag=TRUE;
-		blank_up(i0+1,j0);
-	}
-	return flag;
-} 
-BOOL FINAL()
-{
-	if(a[0][0]==1&&
-	a[0][1]==2&&
-	a[0][2]==3&&
-	a[1][0]==8&&
-	a[1][1]==0&&
-	a[1][2]==4&&
-	a[2][0]==7&&
-	a[2][1]==6&&
-	a[2][2]==5)
-		return TRUE;
-	else
-		return FALSE;
-}
-
-
-
-int main()
-{
-	int i,j;
-	int i0=0,j0=1;
-	FILE * fp;
-	fp=fopen("a.txt","r");
-	for(i=0;i<3;i++)
-	{
-	for(j=0;j<3;j++)
-		{
-			fscanf(fp,"%d",&a[i][j]);
-		}
-	}	
-	DFS(i0,j0); 
-	return 0;
-}
-
-void DFS(int i0,int j0)
-{
-	int deep=0; 
-	int close=0;
-	int path=0;
-	
-	int i;
-while(TRUE)
-{
-	if(j0!=0&&IsTravel(0,close,path,i0,j0)==FALSE&&path<=DM)
-	{ 
-		save_matrix(c[path],a);
-		path++;
-		deep++;
-		
-		blank_left(i0,j0);
-		j0--;
-	}
-	else if(i0!=0&&IsTravel(1,close,path,i0,j0)==FALSE&&path<=DM)
-	{
-		save_matrix(c[path],a);
-		path++;
-		deep++;
-		
-		blank_up(i0,j0);
-		i0--;
-	}
-	else if(j0!=2&&IsTravel(2,close,path,i0,j0)==FALSE&&path<=DM)
-	{
-		save_matrix(c[path],a);
-		path++;
-		deep++;
-		
-		blank_right(i0,j0);
-		j0++;
-	}
-	else if(i0!=2&&IsTravel(3,close,path,i0,j0)==FALSE&&path<=DM)
-	{
-		save_matrix(c[path],a);
-		path++;
-		deep++;
-		
-		blank_down(i0,j0);
-		i0++;
-	}
-	else
-	{
-		save_matrix(b[close],a);
-		close++;//存入close表
-		path--;
-		save_matrix(a,c[path]);
-		int m,n;
-		for(m=0;m<3;m++)
-		{
-			for(n=0;n<3;n++)
-				if(a[m][n]==0)
-				{
-					i0=m;
-					j0=n;
-				}
-		 } 
-	}
-	if(FINAL()==TRUE)
-	{
-		printf("FIND!\n");	
-		break;
-	}
-}
-	for(i=0;i<path;i++)
-	{
-		show_matrix(c[i]);
-	}
-	show_matrix(a);
-}
-
-
-(m=0;m<3;m++)
-		{
-			for(n=0;n<3;n++)
-				if(a[m][n]==0)
-				{
-					i0=m;
-					j0=n;
-				}
-		 } 
-	}
-	if(FINAL()==TRUE)
-	{
-		printf("FIND!\n");	
-		break;
-	}
-}
-	for(i=0;i<path;i++)
-	{
-		show_matrix(c[i]);
-	}
-	show_matrix(a);
-}
 //广度优先
 #include<stdio.h>
 struct node
@@ -278,19 +7,19 @@ struct node
 };
 struct node sh[102], end;
 int count = 1;
- 
+
 void init()
 {
     printf("输入起始节点的位置:n");
     int i, j;
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++)
-            scanf("%d", &sh[0].xy[i][j]);
+            scanf_s("%d", &sh[0].xy[i][j]);
     sh[0].dir = -1;
     printf("输入目标节点的位置:n");
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++)
-            scanf("%d", &sh[101].xy[i][j]);
+            scanf_s("%d", &sh[101].xy[i][j]);
     sh[101].dir = -1;
 }
 int loction(int num)
@@ -302,13 +31,13 @@ int loction(int num)
 long long sign(int num)
 {
     long long  sum;
-    sum = sh[num].xy[0][0]*100000000 + sh[num].xy[0][1]*10000000 + sh[num].xy[0][2]*1000000 + sh[num].xy[1][0]*100000 + sh[num].xy[1][1]*10000 + sh[num].xy[1][2]*1000 + sh[num].xy[2][0]*100 + sh[num].xy[2][1]*10 + sh[num].xy[2][2];
+    sum = sh[num].xy[0][0] * 100000000 + sh[num].xy[0][1] * 10000000 + sh[num].xy[0][2] * 1000000 + sh[num].xy[1][0] * 100000 + sh[num].xy[1][1] * 10000 + sh[num].xy[1][2] * 1000 + sh[num].xy[2][0] * 100 + sh[num].xy[2][1] * 10 + sh[num].xy[2][2];
     return sum;
 }
- 
+
 void mobile(int num)
 {
- 
+
     int temp;
     int loc;
     int up = 1, down = 1, left = 1, right = 1;
@@ -350,7 +79,7 @@ void mobile(int num)
         sh[count].dir = 0;
         count++;
     }
- 
+
 }
 void display(int num)
 {
@@ -362,7 +91,7 @@ void display(int num)
         printf("n");
     }
 }
- 
+
 int search()
 {
     int i = 0;
@@ -386,10 +115,253 @@ int search()
         i++;
     }
 }
- 
+
 int main()
 {
     init();
     search();
     return 0;
+}
+//深度优先
+#include<iostream>
+#include"queue"
+#include"string"
+#include<list>
+using namespace std;
+const string GOAL = "803214765";
+class Situation {
+private:
+
+public:
+    string father;
+    string code;
+    int deep;
+    Situation up();
+    Situation down();
+    Situation left();
+    Situation right();
+    bool isGoal();
+    bool isInOpen(deque<Situation>& open);
+    bool isInClosed(deque<Situation>& closed);
+    void show() const;
+    void show(string) const;
+    void show_deque(deque<Situation>&) const;
+    deque<Situation> showWay(deque<Situation>& closed);
+    void showAnswer(deque<Situation>& closed);
+    Situation() :father(""), code(""), deep(-1) {};
+};
+#include"Deep.h"
+Situation Situation::up() {
+    string::size_type loc = code.find('0');
+    Situation son;
+    son.code = code;
+    son.deep = deep + 1;
+    if (loc >= 3) {
+        char temp = son.code[loc];
+        son.code[loc] = son.code[loc - 3];
+        son.code[loc - 3] = temp;
+    }
+    else {
+        son.code = "";
+    }
+    return son;
+}
+Situation Situation::down() {
+    string::size_type loc = code.find('0');
+    Situation son;
+    son.code = code;
+    son.deep = deep + 1;
+    if (loc <= 5) {
+        char temp = son.code[loc];
+        son.code[loc] = son.code[loc + 3];
+        son.code[loc + 3] = temp;
+    }
+    else {
+        son.code = "";
+    }
+    return son;
+}
+Situation Situation::left() {
+    string::size_type loc = code.find('0');
+    Situation son;
+    son.code = code;
+    son.deep = deep + 1;
+    if (loc != 0 && loc != 3 && loc != 6) {
+        char temp = son.code[loc];
+        son.code[loc] = son.code[loc - 1];
+        son.code[loc - 1] = temp;
+    }
+    else {
+        son.code = "";
+    }
+    return son;
+}
+Situation Situation::right() {
+    string::size_type loc = code.find('0');
+    Situation son;
+    son.code = code;
+    son.deep = deep + 1;
+    if (loc != 2 && loc != 5 && loc != 8) {
+        char temp = son.code[loc];
+        son.code[loc] = son.code[loc + 1];
+        son.code[loc + 1] = temp;
+    }
+    else {
+        son.code = "";
+    }
+    return son;
+}
+bool Situation::isGoal() {
+    return code == GOAL;
+}
+bool Situation::isInOpen(deque<Situation>& open) {
+    for (int i = 0; i < open.size(); i++) {
+        if (code == open.at(i).code) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Situation::isInClosed(deque<Situation>& closed) {
+    for (int i = 0; i < closed.size(); i++) {
+        if (code == closed.at(i).code) {
+            return true;
+        }
+    }
+    return false;
+}
+void Situation::show() const {
+    if (!code.empty()) {
+        cout << code[0] << code[1] << code[2] << endl
+            << code[3] << code[4] << code[5] << endl
+            << code[6] << code[7] << code[8] << endl << endl;
+    }
+    else {
+        cout << "空的" << endl;
+    }
+}
+void Situation::show(string code) const {
+    if (!code.empty()) {
+        cout << code[0] << code[1] << code[2] << endl
+            << code[3] << code[4] << code[5] << endl
+            << code[6] << code[7] << code[8] << endl << endl;
+    }
+    else {
+        cout << "空的" << endl;
+    }
+}
+void Situation::show_deque(deque<Situation>& m_deque) const {
+    for (int i = 0; i < m_deque.size(); i++) {
+        m_deque.at(i).show();
+    }
+}
+deque<Situation> Situation::showWay(deque<Situation>& closed) {
+    //cout << closed.size() << endl;
+    deque<Situation> dequeList;
+    Situation temp = closed.back();
+    dequeList.push_back(temp);
+    for (int i = closed.size() - 1; i >= 0; i--) {
+        if (temp.father == closed.at(i).code) {
+            dequeList.push_back(closed.at(i));
+            temp = closed.at(i);
+        }
+    }
+    //cout << dequeList.size() << endl;
+    return dequeList;
+}
+void Situation::showAnswer(deque<Situation>& closed) {
+    deque<Situation> way(showWay(closed));
+    cout << "共需要" << way.size() << "步" << endl;
+    for (int i = way.size() - 1; i >= 0; i--)
+    {
+        way.at(i).show();
+    }
+    show(GOAL);
+}
+#include<iostream>
+#include"Deep.h"
+using namespace std;
+void loop(deque<Situation>& open, deque<Situation>& closed, int range);
+int main() {
+    string original = "283164705";
+    Situation first;
+    deque<Situation> open, closed;
+    int range = 10;
+    first.code = original;
+    first.deep = 0;
+    open.push_back(first);
+    loop(open, closed, range);
+    return 0;
+}
+void loop(deque<Situation>& open, deque<Situation>& closed, int range) {
+    Situation a;
+    int i = 0;
+    while (!open.empty()) {
+        cout << i++ << endl;
+        if (open.front().code == GOAL) {
+            cout << "成功：" << endl;
+            a.showAnswer(closed);
+            return;
+        }
+        if (open.empty()) {
+            cout << "失败" << endl;
+            return;
+        }
+        closed.push_back(open.front());
+        open.pop_front();
+        if (closed.back().deep == range) {
+            continue;
+        }
+        else {
+            Situation son1 = closed.back().up();
+            Situation son2 = closed.back().down();
+            Situation son3 = closed.back().left();
+            Situation son4 = closed.back().right();
+            if (!son1.code.empty()) {
+                if (!son1.isInOpen(open) && !son1.isInClosed(closed)) {
+                    son1.father = closed.back().code;
+                    open.push_front(son1);
+                }
+            }
+            if (!son2.code.empty()) {
+                if (!son2.isInOpen(open) && !son2.isInClosed(closed)) {
+                    son2.father = closed.back().code;
+                    open.push_front(son2);
+                }
+            }
+            if (!son3.code.empty()) {
+                if (!son3.isInOpen(open) && !son3.isInClosed(closed)) {
+                    son3.father = closed.back().code;
+                    open.push_front(son3);
+                }
+            }
+            if (!son4.code.empty()) {
+                if (!son4.isInOpen(open) && !son4.isInClosed(closed)) {
+                    son4.father = closed.back().code;
+                    open.push_front(son4);
+                }
+
+            }
+            if (son1.isGoal()) {
+                cout << "后继节点中有目标节点：" << endl;
+                son1.showAnswer(closed);
+                break;
+            }
+            if (son2.isGoal()) {
+                cout << "后继节点中有目标节点：" << endl;
+                son2.showAnswer(closed);
+                break;
+            }
+            if (son3.isGoal()) {
+                cout << "后继节点中有目标节点：" << endl;
+                son3.showAnswer(closed);
+                break;
+            }
+            if (son4.isGoal()) {
+                cout << "后继节点中有目标节点：" << endl;
+                son4.showAnswer(closed);
+                break;
+            }
+        }
+    }
 }
